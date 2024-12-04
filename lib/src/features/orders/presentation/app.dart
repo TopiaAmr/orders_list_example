@@ -22,6 +22,8 @@ class App extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
+        themeMode: ThemeMode.system,
+        darkTheme: ThemeData.dark(useMaterial3: true),
         initialRoute: AppRouter.home,
         onGenerateRoute: AppRouter.onGenerateRoute,
         debugShowCheckedModeBanner: false,

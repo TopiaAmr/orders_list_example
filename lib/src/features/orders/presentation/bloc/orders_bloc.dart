@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:orders_list_example/src/features/orders/domain/entities/order.dart';
 import '../../domain/usecases/get_orders.dart';
@@ -12,11 +11,9 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
 
   OrdersBloc({required this.getOrders}) : super(OrdersInitial()) {
     on<LoadOrders>((event, emit) async {
-      print('Loading orders...');
       emit(OrdersLoading());
       try {
         final orders = await getOrders();
-        print('Loaded ${orders.length} orders');
         
         // Use compute for heavy calculations
         final averagePrice = await compute(
@@ -26,7 +23,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           },
           [orders],
         );
-        print('Calculated average price: $averagePrice');
 
         final returnsCount = await compute(
           (List<dynamic> params) {
@@ -35,7 +31,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           },
           [orders],
         );
-        print('Calculated returns count: $returnsCount');
 
         // Create graph points in a separate isolate
         final graphSpots = await compute(
@@ -55,7 +50,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
             event.endDate ?? DateTime.now(),
           ],
         );
-        print('Created ${graphSpots.length} graph spots');
 
         emit(OrdersLoaded(
           orders: orders,
@@ -64,9 +58,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           returnsCount: returnsCount,
           graphSpots: graphSpots,
         ));
-        print('Emitted OrdersLoaded state');
       } catch (e) {
-        print('Error loading orders: $e');
         emit(OrdersError(e.toString()));
       }
     });
