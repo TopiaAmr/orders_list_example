@@ -9,8 +9,29 @@ abstract class LocalOrdersDataSource {
 class LocalOrdersDataSourceImpl implements LocalOrdersDataSource {
   @override
   Future<List<OrderModel>> getOrders() async {
-    final String jsonString = await rootBundle.loadString('assets/orders.json');
-    final List<dynamic> jsonList = json.decode(jsonString);
-    return jsonList.map((json) => OrderModel.fromJson(json)).toList();
+    try {
+      final String jsonString = await rootBundle.loadString('assets/orders.json');
+      if (jsonString.isEmpty) {
+        throw Exception('orders.json is empty');
+      }
+      
+      final List<dynamic> jsonList = json.decode(jsonString);
+      if (jsonList.isEmpty) {
+        throw Exception('No orders found in orders.json');
+      }
+      
+      return jsonList.map((json) {
+        try {
+          return OrderModel.fromJson(json);
+        } catch (e) {
+          print('Error parsing order: $json');
+          print('Error details: $e');
+          rethrow;
+        }
+      }).toList();
+    } catch (e) {
+      print('Error loading orders: $e');
+      rethrow;
+    }
   }
 }

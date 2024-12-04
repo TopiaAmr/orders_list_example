@@ -1,8 +1,36 @@
 import 'package:flutter/material.dart';
-import '../../../../core/navigation/app_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:orders_list_example/src/features/orders/presentation/bloc/orders_bloc.dart';
+import 'package:orders_list_example/src/features/orders/presentation/bloc/orders_event.dart';
+import 'graph_screen.dart';
+import 'metrics_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = const [
+    MetricsScreen(),
+    GraphScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<OrdersBloc>().add(LoadOrders());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,23 +39,20 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Orders Dashboard'),
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              onPressed: () => Navigator.pushNamed(context, AppRouter.metrics),
-              icon: const Icon(Icons.analytics),
-              label: const Text('View Metrics'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => Navigator.pushNamed(context, AppRouter.graph),
-              icon: const Icon(Icons.show_chart),
-              label: const Text('View Graph'),
-            ),
-          ],
-        ),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.analytics),
+            label: 'Metrics',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.show_chart),
+            label: 'Graph',
+          ),
+        ],
       ),
     );
   }
