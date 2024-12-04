@@ -13,23 +13,28 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
     on<LoadOrders>((event, emit) async {
       emit(OrdersLoading());
       try {
-        final orders = await getOrders();
+        final allOrders = await getOrders();
         
+        // Filter orders by status if specified
+        final filteredOrders = event.status != null
+            ? allOrders.where((order) => order.status == event.status).toList()
+            : allOrders;
+
         // Use compute for heavy calculations
         final averagePrice = await compute(
           (List<dynamic> params) {
             final orders = params[0] as List<Order>;
-            return orders.fold<double>(0, (sum, order) => sum + order.price) / orders.length;
+            return OrdersGraphHelper.calculateAveragePrice(orders);
           },
-          [orders],
+          [filteredOrders],
         );
 
         final returnsCount = await compute(
           (List<dynamic> params) {
             final orders = params[0] as List<Order>;
-            return orders.where((order) => !order.isActive).length;
+            return OrdersGraphHelper.calculateReturnsCount(orders);
           },
-          [orders],
+          [filteredOrders],
         );
 
         // Create graph points in a separate isolate
@@ -38,23 +43,24 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
             final orders = params[0] as List<Order>;
             final startDate = params[1] as DateTime;
             final endDate = params[2] as DateTime;
-            return OrdersGraphHelper.createDataPoints(
+            return OrdersGraphHelper.createGraphPoints(
               orders,
-              startDate: startDate,
-              endDate: endDate,
+              startDate,
+              endDate,
             );
           },
           [
-            orders,
+            filteredOrders,
             event.startDate ?? DateTime.now().subtract(const Duration(days: 30)),
             event.endDate ?? DateTime.now(),
           ],
         );
 
         emit(OrdersLoaded(
-          orders: orders,
+          orders: filteredOrders,
+          allOrders: allOrders,
           averagePrice: averagePrice,
-          totalCount: orders.length,
+          totalCount: filteredOrders.length,
           returnsCount: returnsCount,
           graphSpots: graphSpots,
         ));

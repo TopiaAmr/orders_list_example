@@ -2,11 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import '../entities/order.dart';
 
 class OrdersGraphHelper {
-  static List<FlSpot> createDataPoints(
-    List<Order> orders, {
-    required DateTime startDate,
-    required DateTime endDate,
-  }) {
+  static List<FlSpot> createGraphPoints(
+    List<Order> orders,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     if (orders.isEmpty) return [];
 
     // Pre-calculate date bounds to avoid repeated calculations
@@ -34,5 +34,19 @@ class OrdersGraphHelper {
       final timestamp = startMillis + (index * Duration.millisecondsPerDay);
       return FlSpot(timestamp.toDouble(), countsByIndex[index].toDouble());
     });
+  }
+
+  static double calculateAveragePrice(List<Order> orders) {
+    if (orders.isEmpty) return 0;
+
+    double totalPrice = 0;
+    for (final order in orders) {
+      totalPrice += order.price;
+    }
+    return totalPrice / orders.length;
+  }
+
+  static int calculateReturnsCount(List<Order> orders) {
+    return orders.where((order) => !order.isActive).length;
   }
 }

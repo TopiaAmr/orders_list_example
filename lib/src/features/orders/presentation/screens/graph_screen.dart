@@ -16,6 +16,7 @@ class GraphScreen extends StatefulWidget {
 class _GraphScreenState extends State<GraphScreen> {
   DateTime _startDate = DateTime(2021, 5, 1);
   DateTime _endDate = DateTime(2021, 5, 23);
+  String? _selectedStatus;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _GraphScreenState extends State<GraphScreen> {
     context.read<OrdersBloc>().add(LoadOrders(
       startDate: _startDate,
       endDate: _endDate,
+      status: _selectedStatus,
     ));
   }
 
@@ -49,17 +51,24 @@ class _GraphScreenState extends State<GraphScreen> {
     }
   }
 
+  void _onStatusChanged(String? status) {
+    setState(() {
+      _selectedStatus = status;
+    });
+    _loadOrders();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OrdersBloc, OrdersState>(
-      builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Orders Dashboard',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            elevation: 0,
-          ),
-          body: Padding(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Orders Dashboard',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        elevation: 0,
+      ),
+      body: BlocBuilder<OrdersBloc, OrdersState>(
+        builder: (context, state) {
+          return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,9 +96,9 @@ class _GraphScreenState extends State<GraphScreen> {
                 _buildContent(context, state),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -145,6 +154,12 @@ class _GraphScreenState extends State<GraphScreen> {
               child: OrdersGraph(
                 spots: state.graphSpots,
                 primaryColor: Theme.of(context).primaryColor,
+                availableStatuses: state.allOrders
+                    .map((order) => order.status)
+                    .toSet()
+                    .toList(),
+                selectedStatus: _selectedStatus,
+                onStatusChanged: _onStatusChanged,
               ),
             ),
           ],
@@ -172,6 +187,7 @@ class _GraphScreenState extends State<GraphScreen> {
                   context.read<OrdersBloc>().add(LoadOrders(
                     startDate: _startDate,
                     endDate: _endDate,
+                    status: _selectedStatus,
                   ));
                 },
                 child: const Text('Retry'),
