@@ -2,11 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
+/// An interactive time-series graph widget for displaying order data.
+/// 
+/// Features:
+/// - Status filtering through a dropdown
+/// - Horizontal scrolling for date navigation
+/// - Interactive tooltips showing order counts
+/// - Gradient-filled area under the line
+/// 
+/// The graph automatically adjusts its viewport and scales based on the
+/// provided data points.
 class OrdersGraph extends StatefulWidget {
+  /// Data points to display on the graph
   final List<FlSpot> spots;
+  
+  /// Primary color used for the line and gradient
   final Color primaryColor;
+  
+  /// List of all available order statuses for filtering
   final List<String> availableStatuses;
+  
+  /// Callback when user changes the status filter
   final Function(String?) onStatusChanged;
+  
+  /// Currently selected status
   final String? selectedStatus;
 
   const OrdersGraph({
@@ -22,11 +41,22 @@ class OrdersGraph extends StatefulWidget {
   State<OrdersGraph> createState() => _OrdersGraphState();
 }
 
+/// State for the OrdersGraph widget handling viewport calculations
+/// and user interactions.
 class _OrdersGraphState extends State<OrdersGraph> {
+  /// Number of days visible in the viewport at once
   static const double _visibleDays = 7.0;
+  
+  /// Minimum x-coordinate (timestamp) in the data
   late double _minX;
+  
+  /// Maximum x-coordinate (timestamp) in the data
   late double _maxX;
+  
+  /// Size of the viewport in milliseconds
   late double _viewportSize;
+  
+  /// Current position of the viewport (left edge)
   late double _currentPosition;
 
   @override
@@ -43,6 +73,12 @@ class _OrdersGraphState extends State<OrdersGraph> {
     }
   }
 
+  /// Initializes the viewport parameters based on the data points.
+  /// 
+  /// Sets up:
+  /// - Viewport size (7 days worth of milliseconds)
+  /// - Min/max x coordinates
+  /// - Initial viewport position
   void _initializeViewport() {
     if (widget.spots.isEmpty) return;
     
@@ -52,6 +88,10 @@ class _OrdersGraphState extends State<OrdersGraph> {
     _currentPosition = _maxX - _viewportSize; // Start at the end
   }
 
+  /// Handles horizontal drag gestures to scroll the graph.
+  /// 
+  /// Updates the viewport position based on the drag delta,
+  /// ensuring it stays within the valid range.
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     setState(() {
       final newPosition = _currentPosition - details.primaryDelta! * 86400000.0 / 100;
@@ -215,6 +255,10 @@ class _OrdersGraphState extends State<OrdersGraph> {
     );
   }
 
+  /// Builds the status filter dropdown widget.
+  /// 
+  /// Shows a dropdown with all available statuses and an "All Statuses"
+  /// option. The dropdown is styled with a border and proper spacing.
   Widget _buildStatusFilter() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),

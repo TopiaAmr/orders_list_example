@@ -6,6 +6,16 @@ import '../../domain/helpers/orders_graph_helper.dart';
 import 'orders_event.dart';
 import 'orders_state.dart';
 
+/// BLoC for managing order-related state and operations.
+/// 
+/// This bloc handles:
+/// - Loading orders with optional filtering
+/// - Calculating order metrics
+/// - Processing order data for graphical display
+/// 
+/// The bloc maintains both filtered and unfiltered order lists to support
+/// features like status filtering while preserving the complete list of
+/// available statuses.
 class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   final GetOrders getOrders;
 

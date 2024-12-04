@@ -6,6 +6,16 @@ import '../bloc/orders_state.dart';
 import '../bloc/orders_event.dart';
 import '../widgets/orders_graph.dart';
 
+/// A screen that displays order data in a graphical format.
+/// 
+/// This screen features:
+/// - A time-series graph showing order counts over time
+/// - Status-based filtering capabilities
+/// - Automatic data loading and refresh handling
+/// 
+/// The screen uses BLoC pattern for state management and automatically
+/// loads order data when initialized. It also handles different states
+/// (loading, error, loaded) appropriately with visual feedback.
 class GraphScreen extends StatefulWidget {
   const GraphScreen({super.key});
 
@@ -13,6 +23,12 @@ class GraphScreen extends StatefulWidget {
   State<GraphScreen> createState() => _GraphScreenState();
 }
 
+/// State for the GraphScreen widget.
+/// 
+/// Manages:
+/// - Order data loading
+/// - Status filter state
+/// - Graph display configuration
 class _GraphScreenState extends State<GraphScreen> {
   DateTime _startDate = DateTime(2021, 5, 1);
   DateTime _endDate = DateTime(2021, 5, 23);
@@ -51,9 +67,10 @@ class _GraphScreenState extends State<GraphScreen> {
     }
   }
 
-  void _onStatusChanged(String? status) {
+  /// Handles status filter changes by triggering a reload with the new filter.
+  void _onStatusChanged(String? newStatus) {
     setState(() {
-      _selectedStatus = status;
+      _selectedStatus = newStatus;
     });
     _loadOrders();
   }

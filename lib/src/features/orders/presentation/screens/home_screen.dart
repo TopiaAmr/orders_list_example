@@ -5,6 +5,15 @@ import 'package:orders_list_example/src/features/orders/presentation/bloc/orders
 import 'graph_screen.dart';
 import 'metrics_screen.dart';
 
+/// The main navigation screen of the orders feature.
+/// 
+/// This screen provides a bottom navigation bar that allows users to switch
+/// between different views of the orders data:
+/// - Metrics view showing key performance indicators
+/// - Graph view displaying order trends over time
+/// 
+/// The screen maintains the selected tab state and handles navigation
+/// between different views while preserving their state.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -12,14 +21,23 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+/// State for the HomeScreen widget.
+/// 
+/// Manages:
+/// - Current tab selection
+/// - Navigation between different screens
 class _HomeScreenState extends State<HomeScreen> {
+  /// Index of the currently selected tab
   int _selectedIndex = 0;
 
+  /// List of screens available for navigation
   final List<Widget> _screens = const [
     MetricsScreen(),
     GraphScreen(),
   ];
 
+  /// Handles tab selection in the bottom navigation bar.
+  /// Updates the current screen index and triggers a rebuild.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;

@@ -1,7 +1,26 @@
 import 'package:fl_chart/fl_chart.dart';
 import '../entities/order.dart';
 
+/// Helper class for processing order data into graph-friendly formats.
+/// 
+/// This class provides static utility methods for:
+/// - Calculating order metrics (average price, returns count)
+/// - Converting order data into graph points
+/// - Aggregating orders by date
+/// 
+/// The methods are designed to be computationally efficient and are
+/// typically run in isolates for better performance.
 class OrdersGraphHelper {
+  /// Creates a list of [FlSpot] points for displaying orders on a time-series graph.
+  /// 
+  /// Parameters:
+  /// - [orders]: List of orders to process
+  /// - [startDate]: Start date for the graph range
+  /// - [endDate]: End date for the graph range
+  /// 
+  /// Returns a list of [FlSpot] where:
+  /// - x: timestamp in milliseconds
+  /// - y: number of orders for that day
   static List<FlSpot> createGraphPoints(
     List<Order> orders,
     DateTime startDate,
@@ -36,6 +55,10 @@ class OrdersGraphHelper {
     });
   }
 
+  /// Calculates the average price of the given orders.
+  /// 
+  /// Returns 0 if the orders list is empty.
+  /// The calculation handles the price as a double value.
   static double calculateAveragePrice(List<Order> orders) {
     if (orders.isEmpty) return 0;
 
@@ -46,6 +69,9 @@ class OrdersGraphHelper {
     return totalPrice / orders.length;
   }
 
+  /// Counts the number of returned (inactive) orders.
+  /// 
+  /// An order is considered returned if its [isActive] flag is false.
   static int calculateReturnsCount(List<Order> orders) {
     return orders.where((order) => !order.isActive).length;
   }

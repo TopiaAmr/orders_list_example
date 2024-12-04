@@ -5,6 +5,17 @@ import '../bloc/orders_bloc.dart';
 import '../widgets/metric_card.dart';
 import '../widgets/latest_orders_list.dart';
 
+/// A screen that displays key metrics and performance indicators for orders.
+/// 
+/// This screen shows various metrics including:
+/// - Total number of orders
+/// - Average order price
+/// - Number of returned orders
+/// - Other relevant statistics
+/// 
+/// The metrics are displayed using MetricCard widgets arranged in a grid
+/// layout. The screen automatically loads and updates data using the
+/// OrdersBloc for state management.
 class MetricsScreen extends StatelessWidget {
   const MetricsScreen({super.key});
 
