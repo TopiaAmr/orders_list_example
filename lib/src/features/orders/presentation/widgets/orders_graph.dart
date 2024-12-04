@@ -75,7 +75,6 @@ class _OrdersGraphState extends State<OrdersGraph> {
       );
     }
 
-    final visibleSpots = _getVisibleSpots();
     final maxY = widget.spots.map((spot) => spot.y).reduce((a, b) => a > b ? a : b) + 1;
 
     return GestureDetector(
@@ -86,7 +85,7 @@ class _OrdersGraphState extends State<OrdersGraph> {
           maxX: _currentPosition + _viewportSize,
           minY: 0,
           maxY: maxY,
-          clipData: FlClipData.all(),
+          clipData: const FlClipData.all(),
           gridData: FlGridData(
             show: true,
             drawVerticalLine: true,

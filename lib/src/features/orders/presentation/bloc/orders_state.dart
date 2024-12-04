@@ -17,6 +17,7 @@ class OrdersLoaded extends OrdersState {
   final int totalCount;
   final int returnsCount;
   final List<FlSpot> graphSpots;
+  final int activeOrdersCount;
 
   OrdersLoaded({
     required this.orders,
@@ -24,10 +25,10 @@ class OrdersLoaded extends OrdersState {
     required this.totalCount,
     required this.returnsCount,
     required this.graphSpots,
-  });
+  }) : activeOrdersCount = orders.where((order) => order.isActive).length;
 
   @override
-  List<Object> get props => [orders, averagePrice, totalCount, returnsCount, graphSpots];
+  List<Object> get props => [orders, averagePrice, totalCount, returnsCount, graphSpots, activeOrdersCount];
 }
 
 class OrdersError extends OrdersState {

@@ -2,81 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:orders_list_example/src/features/orders/presentation/bloc/orders_state.dart';
 import '../bloc/orders_bloc.dart';
+import '../widgets/metric_card.dart';
+import '../widgets/latest_orders_list.dart';
 
 class MetricsScreen extends StatelessWidget {
   const MetricsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OrdersBloc, OrdersState>(
-      builder: (context, state) {
-        if (state is OrdersLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is OrdersLoaded) {
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildMetricCard(
-                  'Total Orders',
-                  state.totalCount.toString(),
-                  Icons.shopping_cart,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Metrics & Latest Orders',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        elevation: 0,
+      ),
+      body: BlocBuilder<OrdersBloc, OrdersState>(
+        builder: (context, state) {
+          if (state is OrdersLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is OrdersLoaded) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Key Metrics',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 1.5,
+                      children: [
+                        MetricCard(
+                          title: 'Total Orders',
+                          value: state.totalCount.toString(),
+                          icon: Icons.shopping_cart,
+                          color: Colors.blue,
+                        ),
+                        MetricCard(
+                          title: 'Average Price',
+                          value: '\$${state.averagePrice.toStringAsFixed(2)}',
+                          icon: Icons.attach_money,
+                          color: Colors.green,
+                        ),
+                        MetricCard(
+                          title: 'Returns',
+                          value: state.returnsCount.toString(),
+                          icon: Icons.assignment_return,
+                          color: Colors.orange,
+                        ),
+                        MetricCard(
+                          title: 'Active Orders',
+                          value: state.orders.where((order) => order.isActive).length.toString(),
+                          icon: Icons.local_shipping,
+                          color: Colors.purple,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Latest Orders',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    LatestOrdersList(orders: state.orders.take(5).toList()),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                _buildMetricCard(
-                  'Average Price',
-                  '\$${state.averagePrice.toStringAsFixed(2)}',
-                  Icons.attach_money,
-                ),
-                const SizedBox(height: 16),
-                _buildMetricCard(
-                  'Returns',
-                  state.returnsCount.toString(),
-                  Icons.assignment_return,
-                ),
-              ],
-            ),
-          );
-        } else if (state is OrdersError) {
-          return Center(child: Text('Error: ${state.message}'));
-        }
-        return const SizedBox();
-      },
-    );
-  }
-
-  Widget _buildMetricCard(String title, String value, IconData icon) {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Icon(icon, size: 40),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            );
+          } else if (state is OrdersError) {
+            return Center(child: Text('Error: ${state.message}'));
+          }
+          return const SizedBox();
+        },
       ),
     );
   }
